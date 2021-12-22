@@ -1,28 +1,7 @@
-Testing project for creating a userscripts using Svelte and Rollup.
+## Юзерскрипт для публикации картинок с [Anime-Pictures](https://anime-pictures.net/) во ВКонтакте.
+* возможность создовать отложенную пубикацию;
+* гибкая настройка автоматического подбора времени для отложеной публикации;
+* предпросмотр уже существующих отложеных публикаций;
+* все настройки вынесены в графический интерфейс.
 
-# Get started
-
-Install the dependencies...
-
-```bash
-cd test-svelte-userscript
-npm install
-```
-
-...then start [Rollup](https://rollupjs.org):
-
-```bash
-npm run dev
-```
-
-Install a script manager, e.g. [Tampermonkey](https://www.tampermonkey.net/), open it, create a new usercript and copy content of build/calculator.user.js file, and save it.
-
-Navitage to [Google home page](https://www.google.com/) and enjoy the calculator.
-
-# Building and running in production mode
-
-To create an optimised version of the app:
-
-```bash
-npm run build
-```
+![image](https://user-images.githubusercontent.com/29704098/147092786-bced2e08-b13d-4595-8f6c-19333c88c965.png)

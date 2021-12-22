@@ -1,13 +1,17 @@
 // ==UserScript==
-// @name         Calculator test
-// @namespace    7nik
-// @version      2.0
-// @description  Adds a calculator to google home page
-// @homepageURL  https://github.com/7nik/test-svelte-userscript
-// @supportURL   https://github.com/7nik/test-svelte-userscript/issues
-// @updateURL    https://github.com/7nik/test-svelte-userscript/releases/latest/download/userscript.meta.js
-// @downloadURL  https://github.com/7nik/test-svelte-userscript/releases/latest/download/userscript.user.js
-// @author       7nik
-// @match        https://www.google.com/
-// @grant        none
+// @name         AP VK poster
+// @namespace    7nik@anime-pictures.net
+// @version      2.1.0
+// @description  Make a post with a picture in vk.com/mjvart
+// @author       7nik, MiTereKun
+// @match        https://anime-pictures.net/pictures/view_post/*
+// @grant        GM.xmlHttpRequest
+// @connect      ip1.anime-pictures.net
+// @connect      cdn.anime-pictures.net
+// @connect      oauth.vk.com
+// @connect      login.vk.com
+// @connect      api.vk.com
+// @connect      pu.vk.com
+// @connect      pu5-1.vk-cdn.net
+// @connect      vk-cdn.net
 // ==/UserScript==

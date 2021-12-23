@@ -125,7 +125,7 @@
 		const scheduler = SETTINGS.scheduleMethod === "step" 
 			? proposeDateByStep 
 			: proposeDateBySchedule;
-		pubtimeStr = scheduler(posts[0].date*1000).toISOString().slice(0, -1);
+		pubtimeStr = scheduler(posts[0]?.date*1000).toISOString().slice(0, -1);
 	})();
 
 	async function makePost() {

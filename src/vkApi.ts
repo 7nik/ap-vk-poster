@@ -371,71 +371,41 @@ type EventAttachment = {
     friends: number[]
 }
 
+type AttachmentTemplate<Name extends string, Type> = {
+    [k in Name]: Type;
+} & {
+    type: Name;
+};
+
 /**
  * Attachment with its type
  * @see https://vk.com/dev/objects/attachments_w
  */
-type Attachment = {
-    type: "photo",
-    photo: PhotoAttachment,
-} | {
-    type: "posted_photo",
-    posted_photo: PostedPhotoAttachment,
-} | {
-    type: "video",
-    video: VideoAttachment,
-} | {
-    type: "audio",
-    audio: AudioAttachment,
-} | {
-    type: "doc",
-    doc: DocumentAttachment,
-} | {
-    type: "graffiti",
-    graffiti: GraffitiAttachment,
-} | {
-    type: "link",
-    link: LinkAttachment,
-} | {
-    type: "note",
-    note: NoteAttachment,
-} | {
-    type: "app",
-    app: ApplicationAttachment,
-} | {
-    type: "poll",
-    poll: PollAttachment,
-} | {
-    type: "page",
-    page: WikiPageAttachment,
-} | {
-    type: "album",
-    album: PhotoAlbumAttachment
-} | {
-    type: "photos_list",
-    photos_list: PhotoListAttachment,
-} | {
-    type: "market",
-    market: MarketItemAttachment,
-} | {
-    type: "market_album",
-    market_album: MarketAlbumAttachment,
-} | {
-    type: "sticker",
-    sticker: StickerAttachment,
-} | {
-    type: "pretty_cards",
-    pretty_cards: PrettyCardsAttachment
-} | {
-    type: "event",
-    event: EventAttachment,
-} | { 
-// General attachment - stub for unknown attachments
-    type: Exclude<"photo"|"posted_photo"|"video"|"audio"|"doc"|"graffiti"|"link"|
-        "note"|"app"|"poll"|"page"|"album"|"photos_list"|"market"|"market_album"|
-        "sticker"|"pretty_cards"|"event", string>,
-    [prop: string]: any,
-};
+type Attachment = 
+    AttachmentTemplate<"photo", PhotoAttachment> |
+    AttachmentTemplate<"posted_photo", PostedPhotoAttachment> |
+    AttachmentTemplate<"video", VideoAttachment> |
+    AttachmentTemplate<"audio", AudioAttachment> | 
+    AttachmentTemplate<"doc", DocumentAttachment> | 
+    AttachmentTemplate<"graffiti", GraffitiAttachment> | 
+    AttachmentTemplate<"link", LinkAttachment> | 
+    AttachmentTemplate<"note", NoteAttachment> | 
+    AttachmentTemplate<"app", ApplicationAttachment> | 
+    AttachmentTemplate<"poll", PollAttachment> | 
+    AttachmentTemplate<"page", WikiPageAttachment> | 
+    AttachmentTemplate<"album", PhotoAlbumAttachment> | 
+    AttachmentTemplate<"photos_list", PhotoListAttachment> | 
+    AttachmentTemplate<"market", MarketItemAttachment> | 
+    AttachmentTemplate<"market_album", MarketAlbumAttachment> |
+    AttachmentTemplate<"sticker", StickerAttachment> | 
+    AttachmentTemplate<"pretty_cards", PrettyCardsAttachment> | 
+    AttachmentTemplate<"event", EventAttachment> | 
+    // General attachment - stub for unknown attachments
+    AttachmentTemplate<
+        Exclude<"photo"|"posted_photo"|"video"|"audio"|"doc"|"graffiti"|"link"|
+            "note"|"app"|"poll"|"page"|"album"|"photos_list"|"market"|"market_album"|
+            "sticker"|"pretty_cards"|"event", string>,
+        any>
 
 /**
  * @see https://vk.com/dev/objects/post
@@ -568,6 +538,140 @@ type PhotoUploadOnWallParams = {
     longitude?: number,
 };
 
+/**
+ * @see https://dev.vk.com/reference/objects/group
+ */
+type GroupObject<E extends (keyof GroupObjectOptional)[] = []> = XOR<{
+    id: number,
+    name: string,
+    screen_name: string,
+    is_closed: 0|1|2,
+    deactivated?: "deleted" | "banned",
+    is_admin?: bool,
+    admin_level?: 1|2|3,
+    is_member?: bool, 
+    is_advertiser?: bool,
+    invited_by?: number,
+    type: "group" | "page" | "event",
+    photo_50: string,
+    photo_100: string,
+    photo_200: string,
+}, Pick<GroupObjectOptional, E[number]>>;
+type GroupObjectOptional = {
+    activity: string,
+    addresses: {
+        is_enabled: boolean,
+        main_address_id: number,
+    },
+    age_limits: 1|2|3,
+    ban_info: {
+        end_date: number,
+        comment: string,
+    },
+    can_create_topic: bool,
+    can_message: bool,
+    can_post: bool,
+    can_see_all_posts: bool,
+    can_upload_doc: bool,
+    can_upload_video: bool,
+    city: {
+        id: number,
+        title: string,
+    },
+    contacts: {
+        user_id: number,
+        desc: string,
+        phone: string,
+        email: string,
+    }[],
+    counters: {
+        photos?: number,
+        albums?: number,
+        audios?: number,
+        videos?: number,
+        topics?: number,
+        docs?: number,
+    },
+    country: {
+        id: number,
+        title: string,
+    },
+    cover: {
+        enabled: bool,
+        images: {
+            url: string,
+            width: number,
+            height: number,
+        }[],
+    },
+    crop_photo: {
+        photo: PhotoAttachment, // this type?
+        crop: {
+            x: number,
+            y: number,
+            x2: number,
+            y2: number,
+        },
+        rect: {
+            x: number,
+            y: number,
+            x2: number,
+            y2: number,
+        }
+    }
+    description: string,
+    fixed_post: number,
+    has_photo: bool,
+    is_favorite: bool,
+    is_hidden_from_feed: bool,
+    is_messages_blocked: bool,
+    links: {
+        id: number,
+        url: string,
+        name: string,
+        desc: string,
+        photo_50: string,
+        photo_100: string,
+    }[],
+    main_album_id: number,
+    main_section: 0|1|2|3|4|5,
+    market: {
+        enabled: 0,
+    } | {
+        enabled: 1,
+        type: "basic" | "advanced",
+        price_min: number,
+        price_max: number,
+        main_album_id: number,
+        contact_id: number,
+        currency: {
+            id: number,
+            name: string,
+        },
+        currency_text: string,
+    },
+    member_status: 0|1|2|3|4|5,
+    members_count: number,
+    place: {
+        id: number,
+        title: string,
+        latitude: number,
+        longitude: number,
+        type: string,
+        country: number,
+        city: number,
+        address: string,
+    },
+    public_date_label: string,
+    site: string,
+    start_date: number,
+    finish_date: number,
+    status: string,
+    trending: number,
+    verified: bool,
+    wall: 0|1|2|3,
+    wiki_page: string,
+}
 
 /**
  * List of user access permissions.
@@ -666,9 +770,11 @@ class VkApi {
 
     wall;
     photos;
+    groups;
     
     /**
      * Get the valid access token.
+     * @param revoke whether forcefully update the token
      */
     async #getToken (revoke = false): Promise<string> {
         // get stored token
@@ -869,6 +975,20 @@ class VkApi {
                 });
 
                 return photos[0];
+            }
+        };
+        this.groups = {
+            /**
+             * Returns a list of groups whose ID or urlName matches provided ones
+             * @param group_ids list of IDs or url handles
+             * @param fields extra fields to request, pass [] if don't need them
+             * @returns list of matched groups
+             */
+            getById<extra extends (keyof GroupObjectOptional)[] | []>(
+                // @ ts-ignore
+                group_ids: string|number|(string|number)[], fields: extra
+            ): Promise<GroupObject<extra>[]> {
+                return call("groups.getById", { group_ids, fields });
             }
         };
     }

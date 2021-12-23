@@ -1,6 +1,7 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import SETTINGS from "./settings";
+    import VkApi from "./vkApi";
 
     const light = !getContext("darkTheme");
 
@@ -22,12 +23,6 @@
         return `${h.padStart(2, "0")}:${m.padStart(2, "0")}`
     }
 
-    let dayStart = timeToStr(SETTINGS.dayStarts);
-    $: saveTime(dayStart, "dayStarts");
-    let dayEnd = timeToStr(SETTINGS.dayEnds);
-    $: saveTime(dayEnd, "dayEnds");
-    let time = new Date().toTimeString().slice(0, 5);
-
     function addTime () {
         let [h,m] = time.split(":");
         let t = +h*60 + +m;
@@ -42,6 +37,43 @@
         SETTINGS.schedule = SETTINGS.schedule;
         save();
     }
+
+    let dayStart = timeToStr(SETTINGS.dayStarts);
+    $: saveTime(dayStart, "dayStarts");
+    let dayEnd = timeToStr(SETTINGS.dayEnds);
+    $: saveTime(dayEnd, "dayEnds");
+    let time = new Date().toTimeString().slice(0, 5);
+
+	const Vk = new VkApi(SETTINGS.APP_ID, ["photos", "wall"]);
+
+    let groupName = "";
+    Vk.groups.getById(SETTINGS.gid, []).then((groups) => {
+        const group = groups.find(({ id }) => id === SETTINGS.gid);
+        if (group && group.screen_name !== groupName) {
+            groupName = group.screen_name ?? "";
+        } 
+    });
+
+    let timer: NodeJS.Timeout;
+    $: {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+            if (!groupName) return;
+            try {
+                const groups = await Vk.groups.getById(groupName, []);
+                const group = groups.find(({ screen_name }) => screen_name === groupName);
+                SETTINGS.gid = group?.id ?? 0;
+                save();
+            } catch (ex: any) {
+                // when no group with such name
+                if (ex.message.startsWith("#100:")) {
+                    SETTINGS.gid = 0;
+                } else {
+                    throw ex;
+                }
+            }
+        }, 1000);
+    } 
 
     let section = "message";
 </script>
@@ -154,8 +186,9 @@
 
     {:else if section === "postoptions"}
         <label>
-            ID группы для публикации: 
-            <input type="number" bind:value={SETTINGS.gid} on:change={save}>
+            Адресс группы для публикации:
+            <input bind:value={groupName}>
+            ID: {SETTINGS.gid}
         </label>
         <label>
             <input type="checkbox" bind:checked={SETTINGS.signPost} on:change={save}>

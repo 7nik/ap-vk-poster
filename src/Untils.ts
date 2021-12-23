@@ -22,7 +22,8 @@ function makeMessage (artists: string[], postSimpleUrl: string) {
         }
     });
     if (Math.random() < SETTINGS.bonusMessageOdds) {
-        msg += "\n\n" + SETTINGS.bonusMessages[Math.floor(Math.random()*SETTINGS.bonusMessages.length)];
+        const list = SETTINGS.bonusMessages.split("\n");
+        msg += "\n\n" + list[Math.floor(Math.random()*list.length)];
     }
     return msg.replace(/^[\s:-]+/, "");
 }

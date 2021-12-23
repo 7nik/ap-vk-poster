@@ -143,7 +143,7 @@
 				attachments: `photo${owner_id}_${id}`,
 				publish_date,
 				copyright: source,
-				topic_id: 1, // Art
+				topic_id: SETTINGS.addTopic ? 1 /* Art category */ : 0
 			});
 			close();
 		} catch (ex: any) {

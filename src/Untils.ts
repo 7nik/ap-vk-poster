@@ -46,7 +46,7 @@ function getPostInfo () {
 }
 
 function proposeDateByStep (lastPostDate: number) {
-    const date = new Date(Math.max(lastPostDate|0, Date.now()));
+    const date = new Date(Math.max(lastPostDate || 0, Date.now()));
     // add the default shift to the next postponing
     date.setMinutes(date.getMinutes() + SETTINGS.stepTime, 0, 0);
     // generate scheduled time
@@ -67,7 +67,7 @@ function proposeDateByStep (lastPostDate: number) {
 }
 
 function proposeDateBySchedule (lastPostDate: number) {
-    const date = new Date(Math.max(lastPostDate|0, Date.now()));
+    const date = new Date(Math.max(lastPostDate || 0, Date.now()));
     date.setSeconds(0, 0);
     // select the next time in the schedule
     const currTime = date.getHours()*60 + date.getMinutes();

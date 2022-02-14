@@ -162,12 +162,18 @@
             <input type="checkbox" bind:checked={postponed} disabled={postponed===null}/>
             отложенная запись
         </label>
+		<input 
+			type="button" 
+			value="{ready ? "Опубликовать пост" : "Подготовка"}" 
+			disabled={!ready} 
+			on:click={makePost} 
+		/>
         <br>
         <input type="datetime-local" bind:value={pubtimeStr} disabled={!postponed} />
         <br>
         <span>{offset}</span>
     </div>
-    <br>
+	<br>
     {#if previews.length > 1}
         Список запланированных постов:
         <div class="previews">
@@ -188,12 +194,6 @@
             {/each}
         </div>
     {/if}
-    <input 
-        type="button" 
-        value="{ready ? "Опубликовать пост" : "Подготовка"}" 
-        disabled={!ready} 
-        on:click={makePost} 
-    />
 </div>
 
 <style>
@@ -225,6 +225,8 @@
 		flex-wrap: wrap;
 		justify-content: space-between;
 		gap: 5px;
+		max-height: 280px;
+		overflow-y: auto;
 	}
 	.previews a:last-child {
 		margin-right: auto;
@@ -235,7 +237,8 @@
 		line-height: 0;
 	}
 	input[type="button"] {
-		margin-left: auto;
+		float: right;
+		margin-top: 5px;
 	}
 	input[disabled] {
 		color: grey;

@@ -13,7 +13,7 @@ function plural (n: number, [singular, paucal, plural]: string[]) {
 function makeMessage (artists: string[], postSimpleUrl: string) {
     let msg = SETTINGS.mainMessage.replaceAll(/\$\w+\$/g, ($$: string) => {
         switch ($$) {
-            case "$ARTIST_WORD$": return artists.length == 1 
+            case "$ARTIST_WORD$": return artists.length == 1
                 ? "Художник"
                 : artists.length > 1 ? "Художники" : "";
             case "$ARTIST_NAME$": return artists.join(", ");
@@ -35,7 +35,10 @@ function getPostInfo () {
     const loc = window.location;
     const simpleUrl = loc.host + loc.pathname + "?lang=ru";
     const fullUrl = loc.origin + loc.pathname + "?lang=ru";
-    const previewUrl = (document.querySelector("link[rel='image_src']") as HTMLAnchorElement).href;
+    const previewUrl = SETTINGS.imgSize === "orig"
+        ? (document.querySelector("#big_preview")!.closest("a") as HTMLAnchorElement).href
+        : (document.querySelector("link[rel='image_src']") as HTMLLinkElement).href
+            .replace("_bp", {small:"_sp", medium:"_cp", big:"_bp"}[SETTINGS.imgSize]);
     const message = makeMessage(artists, simpleUrl);
 
     return {

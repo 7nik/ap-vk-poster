@@ -2,7 +2,7 @@ const DEFAULT_SETTINGS = {
 
     // ========== USER SETTINGS ==========
 
-    mainMessage: 
+    mainMessage:
 `$ARTIST_WORD$: $ARTIST_NAME$  「хорошее качество ↓
 $LINK$`,
     bonusMessages:
@@ -33,16 +33,17 @@ anime-pictures.net/android_app - наше приложение, что бы на
     // scheduling by list of values
     schedule: [ 17, 219, 405, 725, 1205, 1609 ],
 
-    gid: 15035509, 
+    gid: 15035509,
     signPost: true,
     addSource: true,
     addTopic: true,
+    imgSize: "big" as "small"|"medium"|"big"|"orig",
 
     hotkey: "À", // key "`" a.k.a. ё; hotkey to call the post maker, requires "AP hotkeys"
 
     // ========== SYSTEM SETTINGS ==========
 
-    APP_ID: "6733020", 
+    APP_ID: "6733020",
 };
 
 const SETTINGS: typeof DEFAULT_SETTINGS = {

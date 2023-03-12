@@ -51,7 +51,7 @@
         const group = groups.find(({ id }) => id === SETTINGS.gid);
         if (group && group.screen_name !== groupName) {
             groupName = group.screen_name ?? "";
-        } 
+        }
     });
 
     let timer: NodeJS.Timeout;
@@ -73,7 +73,7 @@
                 }
             }
         }, 1000);
-    } 
+    }
 
     let section = "message";
 </script>
@@ -99,7 +99,7 @@
             </label>
         </li>
     </ul>
-    
+
     {#if section === "message"}
 
         Шаблон текст к посту:
@@ -109,9 +109,9 @@
         <textarea bind:value={SETTINGS.bonusMessages} on:change={save}></textarea>
         Шанс добавления бонусного сообщения:
         {Math.round(SETTINGS.bonusMessageOdds*100)}%
-        <input type="range" 
-            min=0 max=1 step=0.01 
-            bind:value={SETTINGS.bonusMessageOdds} 
+        <input type="range"
+            min=0 max=1 step=0.01
+            bind:value={SETTINGS.bonusMessageOdds}
             on:change={save}>
 
     {:else if section === "posttime"}
@@ -124,18 +124,18 @@
         <section>
             Метод выбора времени:
             <label>
-                <input type="radio" 
-                    bind:group={SETTINGS.scheduleMethod} 
+                <input type="radio"
+                    bind:group={SETTINGS.scheduleMethod}
                     on:change={save}
-                    name="method" 
+                    name="method"
                     value="step" >
                     шаг
                 </label>
                 <label>
-                <input type="radio" 
-                    bind:group={SETTINGS.scheduleMethod} 
+                <input type="radio"
+                    bind:group={SETTINGS.scheduleMethod}
                     on:change={save}
-                    name="method" 
+                    name="method"
                     value="scedule" >
                 расписание
             </label>
@@ -143,8 +143,8 @@
 
         {#if SETTINGS.scheduleMethod === "step"}
             <label>
-                Размер шага, минут: 
-                <input type="number" 
+                Размер шага, минут:
+                <input type="number"
                     min="1"
                     max="684000"
                     bind:value={SETTINGS.stepTime}
@@ -152,8 +152,8 @@
                 >
             </label>
             <label>
-                Размер отклонений, минут: 
-                <input type="number" 
+                Размер отклонений, минут:
+                <input type="number"
                     min="0"
                     max={SETTINGS.stepTime}
                     bind:value={SETTINGS.stepTimeDeviation}
@@ -161,11 +161,11 @@
                 >
             </label>
             <label>
-                Начало дня: 
+                Начало дня:
                 <input type="time" bind:value={dayStart}>
             </label>
             <label>
-                Конец дня: 
+                Конец дня:
                 <input type="time" bind:value={dayEnd}>
             </label>
         {:else}
@@ -202,6 +202,15 @@
             <input type="checkbox" bind:checked={SETTINGS.addTopic} on:change={save}>
             Добавлять категорию "Арт"
         </label>
+        <label>
+            Размер изображения для загрузки:
+            <select bind:value={SETTINGS.imgSize}>
+                <option value="small">маленький</option>
+                <option value="medium">средний</option>
+                <option value="big">большой</option>
+                <option value="orig">оригинал</option>
+            </select>
+        </label>
 
     {/if}
 </div>
@@ -219,7 +228,7 @@
         justify-content: space-between;
         border-bottom: 1px solid silver;
         padding-bottom: 10px;
-    }  
+    }
     ul li {
         display: inline;
         padding: 0 5px;
@@ -229,7 +238,7 @@
     }
     ul li::marker {
         content: none;
-    } 
+    }
     ul label {
         cursor: pointer;
     }

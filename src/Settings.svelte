@@ -204,7 +204,7 @@
         </label>
         <label>
             Размер изображения для загрузки:
-            <select bind:value={SETTINGS.imgSize}>
+            <select bind:value={SETTINGS.imgSize} on:blur={save}>
                 <option value="small">маленький</option>
                 <option value="medium">средний</option>
                 <option value="big">большой</option>

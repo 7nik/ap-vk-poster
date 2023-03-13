@@ -1,8 +1,8 @@
 <script lang="ts">
 	import SETTINGS from "./settings";
-	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule } from "./Untils";
+	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale } from "./Untils";
 	import VkApi from "./vkApi";
-	
+
 	export let close = () => {};
 
 	type PostPreview = {
@@ -10,7 +10,7 @@
 		link: string,
 		date: number,
 	};
-	
+
 	const timezone = new Date().getTimezoneOffset();
 	let ready = false;
 	let postponed: boolean | null = true; // null - cannot postpone
@@ -58,14 +58,20 @@
 		source,
 	} = getPostInfo();
 
-	let picture: Promise<Blob> = GM.xmlHttpRequest({
+	let picture: Promise<File> = GM.xmlHttpRequest({
 		method: "GET",
 		url: previewUrl,
 		// @ts-ignore - it's supported in TM
 		responseType: "arraybuffer",
 	// @ts-ignore - TM returns response
-	}).then(({response}) => new File([response], "photo.jpg"));
-	
+	}).then(({ response }) => {
+		const file = new File([response], "photo.jpg", { type: "image/jpeg" });
+		if (SETTINGS.imgSize === "orig" && SETTINGS.imgScale) {
+			return downscale(file, SETTINGS.imgScale);
+		}
+		return file;
+	});
+
 	// create and keep updated a preview object for the post
 	let postPreview: PostPreview = {
 		preview: previewUrl,
@@ -80,7 +86,7 @@
 	const Vk = new VkApi(SETTINGS.APP_ID, ["photos", "wall"]);
 
 	// upload photo
-	let photo = picture.then((pic) => Vk.photos.uploadWallPhoto({
+	let wallPhoto = picture.then((pic) => Vk.photos.uploadWallPhoto({
 		file: pic,
 		group_id: SETTINGS.gid,
 		description: source,
@@ -119,11 +125,11 @@
 				}
 			}
 			return null;
-		}).filter((p): p is PostPreview => p !== null);	
+		}).filter((p): p is PostPreview => p !== null);
 		previews.unshift(postPreview);
 
-		const scheduler = SETTINGS.scheduleMethod === "step" 
-			? proposeDateByStep 
+		const scheduler = SETTINGS.scheduleMethod === "step"
+			? proposeDateByStep
 			: proposeDateBySchedule;
 		pubtimeStr = scheduler(posts[0]?.date*1000).toISOString().slice(0, -1);
 	})();
@@ -131,8 +137,8 @@
 	async function makePost() {
 		// post the message and the picture to vk
 		try {
-			const { id, owner_id} = await photo;
-			const publish_date = postponed && pubtimeDate 
+			const { id, owner_id} = await wallPhoto;
+			const publish_date = postponed && pubtimeDate
 				? pubtimeDate.getTime()/1000 + timezone*60
 				: 0;
 			await Vk.wall.post({
@@ -162,11 +168,11 @@
             <input type="checkbox" bind:checked={postponed} disabled={postponed===null}/>
             отложенная запись
         </label>
-		<input 
-			type="button" 
-			value="{ready ? "Опубликовать пост" : "Подготовка"}" 
-			disabled={!ready} 
-			on:click={makePost} 
+		<input
+			type="button"
+			value="{ready ? "Опубликовать пост" : "Подготовка"}"
+			disabled={!ready}
+			on:click={makePost}
 		/>
         <br>
         <input type="datetime-local" bind:value={pubtimeStr} disabled={!postponed} />

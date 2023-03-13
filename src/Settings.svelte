@@ -211,7 +211,12 @@
                 <option value="orig">оригинал</option>
             </select>
         </label>
-
+        {#if SETTINGS.imgSize === "orig"}
+            <label>
+                Масштабировать изображение:
+                <input type="number" bind:value={SETTINGS.imgScale} on:change={save}>px
+            </label>
+        {/if}
     {/if}
 </div>
 

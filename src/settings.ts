@@ -38,6 +38,7 @@ anime-pictures.net/android_app - наше приложение, что бы на
     addSource: true,
     addTopic: true,
     imgSize: "big" as "small"|"medium"|"big"|"orig",
+    imgScale: 0, // size of the bigger side, 0 - no scale
 
     hotkey: "À", // key "`" a.k.a. ё; hotkey to call the post maker, requires "AP hotkeys"
 

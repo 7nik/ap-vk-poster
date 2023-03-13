@@ -38,7 +38,7 @@ function getPostInfo () {
     const previewUrl = SETTINGS.imgSize === "orig"
         ? (document.querySelector("#big_preview")!.closest("a") as HTMLAnchorElement).href
         : (document.querySelector("link[rel='image_src']") as HTMLLinkElement).href
-            .replace("_bp", {small:"_sp", medium:"_cp", big:"_bp"}[SETTINGS.imgSize]);
+            .replace("_bp", { small:"_sp", medium:"_cp", big:"_bp" }[SETTINGS.imgSize]);
     const message = makeMessage(artists, simpleUrl);
 
     return {
@@ -87,4 +87,47 @@ function proposeDateBySchedule (lastPostDate: number) {
     return date;
 }
 
-export { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule };
+async function downscale (imgFile: File, size = 1000) {
+    const src = URL.createObjectURL(imgFile);
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.addEventListener("error", (ev) => reject(ev.message));
+        img.addEventListener("load", () => resolve(img));
+        img.src = src;
+    });
+    URL.revokeObjectURL(src);
+    const height = img.naturalHeight || img.offsetHeight || img.height;
+    const width = img.naturalWidth || img.offsetWidth || img.width;
+
+    if (height <= size && width <= size) {
+        return imgFile;
+    }
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext && canvas.getContext("2d")!;
+    size = Math.min(size, Math.max(width, height));
+    const [width2, height2] = width >= height
+        ? [size, height / width * size]
+        : [width / height * size, size];
+
+    canvas.height = height2;
+    canvas.width = width2;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(img, 0, 0, width2, height2);
+
+    return new Promise<File>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+            if (blob) {
+                resolve(new File([blob], "picture.jpg", {
+                    type: "image/jpeg",
+                    lastModified: Date.now(),
+                }));
+            } else {
+                reject();
+            }
+        }, "image/jpeg", 1);
+    })
+}
+
+export { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale };

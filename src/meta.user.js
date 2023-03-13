@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AP VK poster
 // @namespace    7nik@anime-pictures.net
-// @version      2.3.0
+// @version      2.4.0
 // @description  Make a post with a picture in vk.com/mjvart
 // @author       7nik, MiTereKun
 // @match        https://anime-pictures.net/*
@@ -14,4 +14,6 @@
 // @connect      pu.vk.com
 // @connect      pu5-1.vk-cdn.net
 // @connect      vk-cdn.net
+// @connect      images.anime-pictures.net
+// @connect      cdn.anime-pictures.net
 // ==/UserScript==

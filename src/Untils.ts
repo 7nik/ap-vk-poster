@@ -28,6 +28,12 @@ function makeMessage (artists: string[], postSimpleUrl: string) {
     return msg.replace(/^[\s:-]+/, "");
 }
 
+function hasTags (...tags: string[]) {
+    return tags.some((tag) => document.querySelector(
+        `.tags>li>a[href*="search_tag=${encodeURIComponent(tag)}"]`,
+    ));
+}
+
 function getPostInfo () {
 	const artists = Array.from(document.querySelectorAll(".tags li.orange a"))
         .map((a) => a.textContent ?? "")
@@ -41,10 +47,16 @@ function getPostInfo () {
             .replace("_bp", { small:"_sp", medium:"_cp", big:"_bp" }[SETTINGS.imgSize]);
     const message = makeMessage(artists, simpleUrl);
 
+    const erotic = hasTags("hard erotic", "тяжёлая эротика") ? 3
+        : hasTags("light erotic", "лёгкая эротика") ? 1
+        : hasTags("erotic", "эротика", "エロチック") ? 2
+        : 0;
+
     return {
         message,
         previewUrl,
         source: fullUrl,
+        erotic,
     }
 }
 

@@ -2,6 +2,7 @@
     import { getContext } from "svelte";
     import SETTINGS from "./settings";
     import VkApi from "./vkApi";
+    import Button from "./Button.svelte";
 
     const light = !getContext("darkTheme");
 
@@ -107,6 +108,7 @@
         <br>
         Бонусные сообщения:
         <textarea bind:value={SETTINGS.bonusMessages} on:change={save}></textarea>
+        <br>
         Шанс добавления бонусного сообщения:
         {Math.round(SETTINGS.bonusMessageOdds*100)}%
         <input type="range"
@@ -171,7 +173,7 @@
         {:else}
             <label>
                 <input type="time" bind:value={time}>
-                <button on:click={addTime}>Добавить время</button>
+                <Button on:click={addTime}>Добавить время</Button>
             </label>
             Список времён для публикации:
             <section>
@@ -217,6 +219,15 @@
                 <input type="number" bind:value={SETTINGS.imgScale} on:change={save}>px
             </label>
         {/if}
+        <label>
+            Максимальный уровень эротики для публикации:
+            <select bind:value={SETTINGS.maxErotic} on:blur={save}>
+                <option value={0}>без эротики</option>
+                <option value={1}>лёгкая эротика</option>
+                <option value={2}>средняя эротика</option>
+                <option value={3}>тяжёлая эротика</option>
+            </select>
+        </label>
     {/if}
 </div>
 

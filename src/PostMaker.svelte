@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Button from "./Button.svelte";
 	import SETTINGS from "./settings";
 	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale } from "./Untils";
 	import VkApi from "./vkApi";
@@ -56,9 +57,14 @@
 		message,
 		previewUrl,
 		source,
+		erotic,
 	} = getPostInfo();
 
-	let picture: Promise<File> = GM.xmlHttpRequest({
+	const tooEroi = erotic > SETTINGS.maxErotic;
+
+	let picture: Promise<File> = tooEroi
+		? new Promise(() => {})
+		: GM.xmlHttpRequest({
 		method: "GET",
 		url: previewUrl,
 		// @ts-ignore - it's supported in TM
@@ -168,12 +174,13 @@
             <input type="checkbox" bind:checked={postponed} disabled={postponed===null}/>
             отложенная запись
         </label>
-		<input
-			type="button"
-			value="{ready ? "Опубликовать пост" : "Подготовка"}"
-			disabled={!ready}
+		<Button
 			on:click={makePost}
-		/>
+			disabled={!ready}
+			error={tooEroi}
+		>
+			{tooEroi ? "Слишком эротично" : ready ? "Опубликовать пост" : "Подготовка"}
+		</Button>
         <br>
         <input type="datetime-local" bind:value={pubtimeStr} disabled={!postponed} />
         <br>
@@ -226,6 +233,10 @@
 	.publish_date input {
 		color: black;
 	}
+	.publish_date :global button {
+		margin-top: 5px;
+		float: right;
+	}
 	.previews {
 		display: flex;
 		flex-wrap: wrap;
@@ -241,12 +252,5 @@
 		border: 3px solid green;
 		margin-bottom: 5px;
 		line-height: 0;
-	}
-	input[type="button"] {
-		float: right;
-		margin-top: 5px;
-	}
-	input[disabled] {
-		color: grey;
 	}
 </style>

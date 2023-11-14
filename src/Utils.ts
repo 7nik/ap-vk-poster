@@ -28,35 +28,49 @@ function makeMessage (artists: string[], postSimpleUrl: string) {
     return msg.replace(/^[\s:-]+/, "");
 }
 
-function hasTags (...tags: string[]) {
-    return tags.some((tag) => document.querySelector(
-        `.tags>li>a[href*="search_tag=${encodeURIComponent(tag)}"]`,
-    ));
-}
+async function getPostInfo () {
+    const postId = window.location.pathname.match(/\/posts\/(\d+)/)?.[1];
+    if (!postId) {
+        alert("Ошибка загрузки информации");
+        throw new Error("No postId");
+    }
 
-function getPostInfo () {
+    const post: {
+        post: {
+            id: number,
+            erotics: 0|1|2|3,
+            small_preview: string,
+            medium_preview: string,
+            big_preview: string,
+        },
+        tags: Array<{
+            tag: { id: number },
+            relation: { removetime: string|null },
+        }>,
+    } = await fetch(`/api/v3/posts/${postId}`).then((resp) => resp.json());
+
 	const artists = Array.from(document.querySelectorAll(".tags li.orange a"))
         .map((a) => a.textContent ?? "")
         .filter((s) => s !== "tagme (artist)");
-    const loc = window.location;
-    const simpleUrl = loc.host + loc.pathname + "?lang=ru";
-    const fullUrl = loc.origin + loc.pathname + "?lang=ru";
     const previewUrl = SETTINGS.imgSize === "orig"
-        ? (document.querySelector("#big_preview")!.closest("a") as HTMLAnchorElement).href
-        : (document.querySelector("link[rel='image_src']") as HTMLLinkElement).href
-            .replace("_bp", { small:"_sp", medium:"_cp", big:"_bp" }[SETTINGS.imgSize]);
-    const message = makeMessage(artists, simpleUrl);
+        ? `https://anime-pictures.net/pictures/get_image/${postId}-original.png`
+        : post.post[`${SETTINGS.imgSize}_preview`];
+    const message = makeMessage(artists, `anime-pictures.net/posts/${postId}?lang=ru`);
 
-    const erotic = hasTags("hard erotic", "тяжёлая эротика") ? 3
-        : hasTags("light erotic", "лёгкая эротика") ? 1
-        : hasTags("erotic", "эротика", "エロチック") ? 2
-        : 0;
+    let error = "";
+    if (post.post.erotics > SETTINGS.maxErotic) {
+        error = "Слишком эротично";
+    }
+    if (post.tags.some((t) => SETTINGS.forbiddenTags.includes(t.tag.id))) {
+        error = "Есть запрещённые теги";
+    }
 
     return {
         message,
         previewUrl,
-        source: fullUrl,
-        erotic,
+        source: `https://anime-pictures.net/posts/${postId}?lang=ru`,
+        erotic: post.post.erotics,
+        error,
     }
 }
 
@@ -142,4 +156,46 @@ async function downscale (imgFile: File, size = 1000) {
     })
 }
 
-export { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale };
+async function getTag (id: number): Promise<{
+    id: number,
+    tag: string,
+    tag_ru: string,
+    tag_en: string,
+    num: number,
+    num_pub: number,
+    type: number,
+    description_en: string,
+    description_ru: string,
+    description_jp: string,
+    alias: number|null,
+    parent: number|null,
+    views: number,
+}> {
+    const json = await fetch(`/api/v3/tags/${id}`).then((resp) => resp.json());
+    return json.tag;
+}
+
+async function findTag (tag: string): Promise<{
+    c: number, // tag category
+    id: number, // tag id
+    t: string, // tag name where the matched part is wrapped by `<b>`
+    t2: string | null, // if it's alias, main tag
+}[]> {
+    const form = new FormData();
+    form.append("tag", tag);
+    const json = await fetch("/pictures/autocomplete_tag", {
+        method: "POST",
+        body: form,
+    }).then((resp) => resp.json());
+    return json.tags_list;
+}
+
+export {
+    plural,
+    getPostInfo,
+    getTag,
+    findTag,
+    proposeDateByStep,
+    proposeDateBySchedule,
+    downscale,
+};

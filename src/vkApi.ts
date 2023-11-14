@@ -78,7 +78,7 @@ type VideoAttachment = {
     views: number,
     comments: number,
     player: string, // url to page with Flash/HTML5 player with this video
-    access_key: string, 
+    access_key: string,
     processing?: 1, // video still is processing
     live?: 1, // it's live video
     upcoming?: 1, // translation will start soon
@@ -99,7 +99,7 @@ type AudioAttachment = {
     lyrics_id?: number,
     album_id?: number,
     genre_id: number, // see https://vk.com/dev/objects/audio_genres
-    date: number, // upload date in unix time 
+    date: number, // upload date in unix time
     no_search?: 1, // is hidden from search
 }
 
@@ -115,7 +115,7 @@ type DocumentAttachment = {
     ext: string, // extension
     url: string,
     date: number, // upload date in unix time
-    type:  
+    type:
         1 | // text documents;
         2 | // archives;
         3 | // gif;
@@ -381,25 +381,25 @@ type AttachmentTemplate<Name extends string, Type> = {
  * Attachment with its type
  * @see https://vk.com/dev/objects/attachments_w
  */
-type Attachment = 
+type Attachment =
     AttachmentTemplate<"photo", PhotoAttachment> |
     AttachmentTemplate<"posted_photo", PostedPhotoAttachment> |
     AttachmentTemplate<"video", VideoAttachment> |
-    AttachmentTemplate<"audio", AudioAttachment> | 
-    AttachmentTemplate<"doc", DocumentAttachment> | 
-    AttachmentTemplate<"graffiti", GraffitiAttachment> | 
-    AttachmentTemplate<"link", LinkAttachment> | 
-    AttachmentTemplate<"note", NoteAttachment> | 
-    AttachmentTemplate<"app", ApplicationAttachment> | 
-    AttachmentTemplate<"poll", PollAttachment> | 
-    AttachmentTemplate<"page", WikiPageAttachment> | 
-    AttachmentTemplate<"album", PhotoAlbumAttachment> | 
-    AttachmentTemplate<"photos_list", PhotoListAttachment> | 
-    AttachmentTemplate<"market", MarketItemAttachment> | 
+    AttachmentTemplate<"audio", AudioAttachment> |
+    AttachmentTemplate<"doc", DocumentAttachment> |
+    AttachmentTemplate<"graffiti", GraffitiAttachment> |
+    AttachmentTemplate<"link", LinkAttachment> |
+    AttachmentTemplate<"note", NoteAttachment> |
+    AttachmentTemplate<"app", ApplicationAttachment> |
+    AttachmentTemplate<"poll", PollAttachment> |
+    AttachmentTemplate<"page", WikiPageAttachment> |
+    AttachmentTemplate<"album", PhotoAlbumAttachment> |
+    AttachmentTemplate<"photos_list", PhotoListAttachment> |
+    AttachmentTemplate<"market", MarketItemAttachment> |
     AttachmentTemplate<"market_album", MarketAlbumAttachment> |
-    AttachmentTemplate<"sticker", StickerAttachment> | 
-    AttachmentTemplate<"pretty_cards", PrettyCardsAttachment> | 
-    AttachmentTemplate<"event", EventAttachment> | 
+    AttachmentTemplate<"sticker", StickerAttachment> |
+    AttachmentTemplate<"pretty_cards", PrettyCardsAttachment> |
+    AttachmentTemplate<"event", EventAttachment> |
     // General attachment - stub for unknown attachments
     AttachmentTemplate<
         Exclude<"photo"|"posted_photo"|"video"|"audio"|"doc"|"graffiti"|"link"|
@@ -439,7 +439,7 @@ type WallPost = {
     },
     reposts: {
         count: number,
-        user_reposted?: bool, // whether the user reposted the post 
+        user_reposted?: bool, // whether the user reposted the post
     },
     views: {
         count: number,
@@ -549,7 +549,7 @@ type GroupObject<E extends (keyof GroupObjectOptional)[] = []> = XOR<{
     deactivated?: "deleted" | "banned",
     is_admin?: bool,
     admin_level?: 1|2|3,
-    is_member?: bool, 
+    is_member?: bool,
     is_advertiser?: bool,
     invited_by?: number,
     type: "group" | "page" | "event",
@@ -751,7 +751,7 @@ function confirmAction (url: string, width: number, height: number): Promise<Loc
             }
         }, 500);
     });
-} 
+}
 
 class VkApi {
     #appid: string;
@@ -771,7 +771,7 @@ class VkApi {
     wall;
     photos;
     groups;
-    
+
     /**
      * Get the valid access token.
      * @param revoke whether forcefully update the token
@@ -837,7 +837,7 @@ class VkApi {
                 },
                 onerror: (xhr) => {
                     self.#updateTokenPromise = undefined;
-                    reject(xhr);
+                    reject((xhr as any).error);
                 },
             });
         });
@@ -857,7 +857,7 @@ class VkApi {
             .map((pair) => pair.map(encodeURIComponent).join("="))
             .join("&");
         const resp: VKResponse<any> = queryString.length < 1500
-            ? await GM_XHR({ 
+            ? await GM_XHR({
                 url: `https://api.vk.com/method/${name}?${queryString}`,
             })
             : await GM_XHR({
@@ -888,7 +888,7 @@ class VkApi {
         }
         this.#appid = appid;
         this.#scope = Array.isArray(scope)
-            ? scope.reduce((sc, str) => sc + SCOPES[str], 0) 
+            ? scope.reduce((sc, str) => sc + SCOPES[str], 0)
             : scope;
         this.#v = v;
 
@@ -903,7 +903,7 @@ class VkApi {
                 return call("wall.get", options);
             },
             /**
-             * Adds a new post on a user wall or community wall. 
+             * Adds a new post on a user wall or community wall.
              * Can also be used to publish suggested or scheduled posts.
              * @param options the post's data
              * @returns id of the post
@@ -913,7 +913,7 @@ class VkApi {
                     ...options,
                     act: "wall_post_box",
                     method: "wall.post",
-                    widget: 4, 
+                    widget: 4,
                     aid: appid,
                     text: options.message,
                     method_access: "_" + Math.random().toString(16).slice(2),
@@ -951,7 +951,7 @@ class VkApi {
              */
             async uploadWallPhoto (options: PhotoUploadOnWallParams): Promise<PhotoAttachment> {
                 const uploadUrl = await this.getWallUploadServer(options.group_id);
-            
+
                 const form = new FormData();
                 form.append("photo", options.file);
                 const photoData = await GM_XHR({

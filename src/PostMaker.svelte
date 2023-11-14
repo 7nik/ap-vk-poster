@@ -1,7 +1,7 @@
 <script lang="ts">
     import Button from "./Button.svelte";
 	import SETTINGS from "./settings";
-	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale } from "./Untils";
+	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale } from "./Utils";
 	import VkApi from "./vkApi";
 
 	export let close = () => {};
@@ -53,22 +53,23 @@
 	}
 
 	// get post info
-	let {
-		message,
-		previewUrl,
-		source,
-		erotic,
-	} = getPostInfo();
+	let message = "";
+	let previewUrl = "";
+	let source = "";
+	let error = "";
 
-	const tooEroi = erotic > SETTINGS.maxErotic;
-
-	let picture: Promise<File> = tooEroi
-		? new Promise(() => {})
-		: GM.xmlHttpRequest({
-		method: "GET",
-		url: previewUrl,
-		// @ts-ignore - it's supported in TM
-		responseType: "arraybuffer",
+	let picture: Promise<File> = getPostInfo().then((post) => {
+		({ message, previewUrl, source, error } = post);
+		if (error) {
+			return new Promise(() => {});
+		}
+	}).then(() => {
+		return GM.xmlHttpRequest({
+			method: "GET",
+			url: previewUrl,
+			// @ts-ignore - it's supported in TM
+			responseType: "arraybuffer",
+		})
 	// @ts-ignore - TM returns response
 	}).then(({ response }) => {
 		const file = new File([response], "photo.jpg", { type: "image/jpeg" });
@@ -111,8 +112,11 @@
             if (ex?.message?.startsWith("#15:")) {
                 // user cannot make postponed posts here
                 postponed = null;
+				return;
             }
-			throw ex;
+			console.error(ex);
+			error ||= "Ошибка подключения в ВК";
+			return;
 		}
 		posts.sort((a, b) => b.date - a.date);
 
@@ -177,9 +181,9 @@
 		<Button
 			on:click={makePost}
 			disabled={!ready}
-			error={tooEroi}
+			error={error !== ""}
 		>
-			{tooEroi ? "Слишком эротично" : ready ? "Опубликовать пост" : "Подготовка"}
+			{error || (ready ? "Опубликовать пост" : "Подготовка")}
 		</Button>
         <br>
         <input type="datetime-local" bind:value={pubtimeStr} disabled={!postponed} />

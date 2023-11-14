@@ -40,6 +40,7 @@ anime-pictures.net/android_app - наше приложение, что бы на
     imgSize: "big" as "small"|"medium"|"big"|"orig",
     imgScale: 0, // size of the bigger side, 0 - no scale
     maxErotic: 1 as 0 | 1 | 2 | 3,
+    forbiddenTags: [] as number[],
 
     hotkey: "À", // key "`" a.k.a. ё; hotkey to call the post maker, requires "AP hotkeys"
 

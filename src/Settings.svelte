@@ -3,6 +3,8 @@
     import SETTINGS from "./settings";
     import VkApi from "./vkApi";
     import Button from "./Button.svelte";
+    import { getTag } from "./Utils";
+    import TagsField from "./TagsField.svelte";
 
     const light = !getContext("darkTheme");
 
@@ -74,6 +76,29 @@
                 }
             }
         }, 1000);
+    }
+
+    let fTags = SETTINGS.forbiddenTags.map((id) => ({ id, name: "..." }));
+    async function loadTags (tags: number[], pos = 0) {
+        if (pos >= tags.length) return;
+        const tag = await getTag(tags[pos]);
+        fTags[pos].name = tag.tag_ru || tag.tag;
+        loadTags(tags, pos + 1);
+    }
+    loadTags(SETTINGS.forbiddenTags);
+    let newTagId: number|null;
+    let newTagName = "";
+    function addTag () {
+        if (!newTagId) return;
+        SETTINGS.forbiddenTags = [...SETTINGS.forbiddenTags, newTagId];
+        save();
+        fTags = [...fTags, { id: newTagId, name: newTagName }];
+        newTagName = "";
+    }
+    function removeTag (id: number) {
+        fTags = fTags.filter((t) => t.id !== id);
+        SETTINGS.forbiddenTags = fTags.map((t) => t.id);
+        save();
     }
 
     let section = "message";
@@ -228,6 +253,22 @@
                 <option value={3}>тяжёлая эротика</option>
             </select>
         </label>
+        <form on:submit|preventDefault={addTag}>
+            Теги запрещающие публикацию:
+            <section>
+                {#each fTags as tag}
+                    <span class="time">
+                        {tag.name}
+                        <span class="icon_delete" class:light on:click={() => removeTag(tag.id)}></span>
+                    </span>
+                {/each}
+            </section>
+            <TagsField
+                bind:tagId={newTagId}
+                bind:value={newTagName}
+            />
+            <Button disabled={!newTagId}>Добавить тег</Button>
+        </form>
     {/if}
 </div>
 

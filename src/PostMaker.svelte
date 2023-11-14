@@ -60,9 +60,6 @@
 
 	let picture: Promise<File> = getPostInfo().then((post) => {
 		({ message, previewUrl, source, error } = post);
-		if (error) {
-			return new Promise(() => {});
-		}
 	}).then(() => {
 		return GM.xmlHttpRequest({
 			method: "GET",
@@ -80,13 +77,7 @@
 	});
 
 	// create and keep updated a preview object for the post
-	let postPreview: PostPreview = {
-		preview: previewUrl,
-		link: "",
-		date: pubtimeDate?.getTime() ?? 0,
-	};
 	$: if (pubtimeDate) {
-		postPreview.date = pubtimeDate.getTime();
 		previews = previews.sort((a, b) => b.date - a.date);
 	}
 
@@ -115,7 +106,7 @@
 				return;
             }
 			console.error(ex);
-			error ||= "Ошибка подключения в ВК";
+			error = "Ошибка подключения к ВК";
 			return;
 		}
 		posts.sort((a, b) => b.date - a.date);
@@ -136,7 +127,12 @@
 			}
 			return null;
 		}).filter((p): p is PostPreview => p !== null);
-		previews.unshift(postPreview);
+		await picture;
+		previews.unshift({
+			preview: previewUrl,
+			link: "",
+			date: pubtimeDate?.getTime() ?? 0,
+		});
 
 		const scheduler = SETTINGS.scheduleMethod === "step"
 			? proposeDateByStep
@@ -249,7 +245,7 @@
 		max-height: 280px;
 		overflow-y: auto;
 	}
-	.previews a:last-child {
+	.previews :last-child {
 		margin-right: auto;
 	}
 	.previews > div {

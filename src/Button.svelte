@@ -3,7 +3,7 @@
     export let error = false;
 </script>
 
-<button class:error disabled={disabled || error} on:click>
+<button class:error disabled={disabled} on:click>
     <slot/>
 </button>
 

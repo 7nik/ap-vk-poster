@@ -44,7 +44,11 @@ async function getPostInfo () {
             big_preview: string,
         },
         tags: Array<{
-            tag: { id: number },
+            tag: {
+                id: number,
+                tag: string,
+                tag_ru: string,
+            },
             relation: { removetime: string|null },
         }>,
     } = await fetch(`/api/v3/posts/${postId}`).then((resp) => resp.json());
@@ -61,15 +65,15 @@ async function getPostInfo () {
     if (post.post.erotics > SETTINGS.maxErotic) {
         error = "Слишком эротично";
     }
-    if (post.tags.some((t) => SETTINGS.forbiddenTags.includes(t.tag.id))) {
-        error = "Есть запрещённые теги";
+    const tags = post.tags.filter((t) => SETTINGS.forbiddenTags.includes(t.tag.id))
+    if (tags.length > 0) {
+        error = `Есть запрещённые теги: ${tags.map(({ tag }) => tag.tag_ru || tag.tag).join(", ")}`;
     }
 
     return {
         message,
         previewUrl,
         source: `https://anime-pictures.net/posts/${postId}?lang=ru`,
-        erotic: post.post.erotics,
         error,
     }
 }

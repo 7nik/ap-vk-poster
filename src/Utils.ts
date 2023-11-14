@@ -51,13 +51,14 @@ async function getPostInfo () {
             },
             relation: { removetime: string|null },
         }>,
+        file_url: string,
     } = await fetch(`/api/v3/posts/${postId}`).then((resp) => resp.json());
 
 	const artists = Array.from(document.querySelectorAll(".tags li.orange a"))
         .map((a) => a.textContent ?? "")
         .filter((s) => s !== "tagme (artist)");
     const previewUrl = SETTINGS.imgSize === "orig"
-        ? `https://anime-pictures.net/pictures/get_image/${postId}-original.png`
+        ? `https://anime-pictures.net/pictures/get_image/${post.file_url}`
         : post.post[`${SETTINGS.imgSize}_preview`];
     const message = makeMessage(artists, `anime-pictures.net/posts/${postId}?lang=ru`);
 

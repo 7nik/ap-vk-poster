@@ -76,11 +76,6 @@
 		return file;
 	});
 
-	// create and keep updated a preview object for the post
-	$: if (pubtimeDate) {
-		previews = previews.sort((a, b) => b.date - a.date);
-	}
-
 	const Vk = new VkApi(SETTINGS.APP_ID, ["photos", "wall"]);
 
 	// upload photo
@@ -111,6 +106,12 @@
 		}
 		posts.sort((a, b) => b.date - a.date);
 
+		const scheduler = SETTINGS.scheduleMethod === "step"
+			? proposeDateByStep
+			: proposeDateBySchedule;
+		pubtimeStr = scheduler(posts[0]?.date*1000).toISOString().slice(0, -1);
+
+		await picture;
 		// generate previews of scheduled posts including the current one
 		previews = posts.map(post => {
 			if (!post.attachments) return null;
@@ -127,17 +128,14 @@
 			}
 			return null;
 		}).filter((p): p is PostPreview => p !== null);
-		await picture;
 		previews.unshift({
 			preview: previewUrl,
 			link: "",
 			date: pubtimeDate?.getTime() ?? 0,
 		});
-
-		const scheduler = SETTINGS.scheduleMethod === "step"
-			? proposeDateByStep
-			: proposeDateBySchedule;
-		pubtimeStr = scheduler(posts[0]?.date*1000).toISOString().slice(0, -1);
+		if (pubtimeDate) {
+			previews = previews.sort((a, b) => b.date - a.date);
+		}
 	})();
 
 	async function makePost() {

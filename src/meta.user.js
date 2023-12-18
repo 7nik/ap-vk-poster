@@ -12,8 +12,10 @@
 // @connect      login.vk.com
 // @connect      api.vk.com
 // @connect      pu.vk.com
+// @connect      id.vk.com
 // @connect      pu5-1.vk-cdn.net
 // @connect      vk-cdn.net
+// @connect      cpreview.anime-pictures.net
 // @connect      images.anime-pictures.net
 // @connect      cdn.anime-pictures.net
 // ==/UserScript==

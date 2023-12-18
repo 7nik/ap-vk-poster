@@ -58,22 +58,36 @@
 	let source = "";
 	let error = "";
 
-	let picture: Promise<File> = getPostInfo().then((post) => {
+	let picture: Promise<File> = getPostInfo().then(async (post) => {
 		({ message, previewUrl, source, error } = post);
-	}).then(() => {
-		return GM.xmlHttpRequest({
+		let resp: GM.Response<void> = await GM.xmlHttpRequest({
 			method: "GET",
 			url: previewUrl,
 			// @ts-ignore - it's supported in TM
 			responseType: "arraybuffer",
-		})
-	// @ts-ignore - TM returns response
-	}).then(({ response }) => {
-		const file = new File([response], "photo.jpg", { type: "image/jpeg" });
+		}) as any;
+		if (resp.status < 400) {
+			const file = new File([resp.response], "photo.jpg", { type: "image/jpeg" });
+			if (SETTINGS.imgSize === "orig" && SETTINGS.imgScale) {
+				return downscale(file, SETTINGS.imgScale);
+			}
+			return file;
+		}
+		resp = await GM.xmlHttpRequest({
+			method: "GET",
+			url: `${previewUrl}.avif`,
+			// @ts-ignore - it's supported in TM
+			responseType: "arraybuffer",
+		}) as any;
+		if (resp.status < 400) {
+			error = "Ошибка скачивания картинки";
+		}
+		const file = new File([resp.response], "photo.avif", { type: "image/jpeg" });
 		if (SETTINGS.imgSize === "orig" && SETTINGS.imgScale) {
 			return downscale(file, SETTINGS.imgScale);
 		}
-		return file;
+		// VK doesn't understands avif so convert it
+		return downscale(file);
 	});
 
 	const Vk = new VkApi(SETTINGS.APP_ID, ["photos", "wall"]);

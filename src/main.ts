@@ -74,8 +74,8 @@ const container = document.querySelector("span#rating");
 if (container) {
 	container.append(btn);
 	// re-add button after it was removed at hydration
-	new MutationObserver((records) => records.forEach((record) => {
-		if (record.removedNodes.length > 0) {
+	new MutationObserver((records) => records.forEach(() => {
+		if (!document.body.contains(btn)) {
 			container.append(btn);
 		}
 	})).observe(container, { childList: true });

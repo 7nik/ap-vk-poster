@@ -960,7 +960,7 @@ class VkApi {
                     data: form,
                 });
 
-                if (photoData.photo == "null" || photoData.photo == "[]") {
+                if (!photoData.photo || photoData.photo == "null" || photoData.photo == "[]") {
                     throw "Image uploading error";
                 }
 

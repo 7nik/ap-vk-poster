@@ -52,7 +52,7 @@ async function getPostInfo () {
             relation: { removetime: string|null },
         }>,
         file_url: string,
-    } = await fetch(`/api/v3/posts/${postId}`).then((resp) => resp.json());
+    } = await fetch(`https://api.anime-pictures.net/api/v3/posts/${postId}`).then((resp) => resp.json());
 
 	const artists = Array.from(document.querySelectorAll(".tags li.orange a"))
         .map((a) => a.textContent ?? "")
@@ -122,7 +122,7 @@ async function downscale (imgFile: File, size = 1000) {
     const src = URL.createObjectURL(imgFile);
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();
-        img.addEventListener("error", (ev) => reject(ev.message));
+        img.addEventListener("error", (ev) => reject(ev.message ?? "Failed to parse the image"));
         img.addEventListener("load", () => resolve(img));
         img.src = src;
     });
@@ -130,7 +130,7 @@ async function downscale (imgFile: File, size = 1000) {
     const height = img.naturalHeight || img.offsetHeight || img.height;
     const width = img.naturalWidth || img.offsetWidth || img.width;
 
-    if (height <= size && width <= size) {
+    if (height <= size && width <= size && !imgFile.name.endsWith(".avif")) {
         return imgFile;
     }
 
@@ -176,7 +176,7 @@ async function getTag (id: number): Promise<{
     parent: number|null,
     views: number,
 }> {
-    const json = await fetch(`/api/v3/tags/${id}`).then((resp) => resp.json());
+    const json = await fetch(`https://api.anime-pictures.net/api/v3/tags/${id}`).then((resp) => resp.json());
     return json.tag;
 }
 
@@ -188,7 +188,7 @@ async function findTag (tag: string): Promise<{
 }[]> {
     const form = new FormData();
     form.append("tag", tag);
-    const json = await fetch("/pictures/autocomplete_tag", {
+    const json = await fetch("https://api.anime-pictures.net/pictures/autocomplete_tag", {
         method: "POST",
         body: form,
     }).then((resp) => resp.json());

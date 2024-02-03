@@ -42,6 +42,7 @@ async function getPostInfo () {
             small_preview: string,
             medium_preview: string,
             big_preview: string,
+            large_preview: string, // in fact doesn't exist
         },
         tags: Array<{
             tag: {
@@ -53,6 +54,7 @@ async function getPostInfo () {
         }>,
         file_url: string,
     } = await fetch(`https://api.anime-pictures.net/api/v3/posts/${postId}`).then((resp) => resp.json());
+    post.post.large_preview = post.post.big_preview.replace("_bp.", "_lp.");
 
 	const artists = Array.from(document.querySelectorAll(".tags li.orange a"))
         .map((a) => a.textContent ?? "")

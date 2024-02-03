@@ -37,7 +37,7 @@ anime-pictures.net/android_app - наше приложение, что бы на
     signPost: true,
     addSource: true,
     addTopic: true,
-    imgSize: "big" as "small"|"medium"|"big"|"orig",
+    imgSize: "big" as "small"|"medium"|"big"|"large"|"orig",
     imgScale: 0, // size of the bigger side, 0 - no scale
     maxErotic: 1 as 0 | 1 | 2 | 3,
     forbiddenTags: [] as number[],

@@ -235,6 +235,7 @@
                 <option value="small">маленький</option>
                 <option value="medium">средний</option>
                 <option value="big">большой</option>
+                <option value="large">огромный</option>
                 <option value="orig">оригинал</option>
             </select>
         </label>

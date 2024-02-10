@@ -53,7 +53,7 @@ async function getPostInfo () {
             relation: { removetime: string|null },
         }>,
         file_url: string,
-    } = await fetch(`https://api.anime-pictures.net/api/v3/posts/${postId}`).then((resp) => resp.json());
+    } = await fetch(`https://api.anime-pictures.net/api/v3/posts/${postId}`, { credentials: "include" }).then((resp) => resp.json());
     post.post.large_preview = post.post.big_preview.replace("_bp.", "_lp.");
 
 	const artists = Array.from(document.querySelectorAll(".tags li.orange a"))

@@ -70,7 +70,7 @@ new MutationObserver((records) => records.forEach((record) => {
 	subtree: true,
 });
 // add the button at the page start
-const container = document.querySelector("span#rating");
+const container = document.querySelector("span.rating");
 if (container) {
 	container.append(btn);
 	// re-add button after it was removed at hydration

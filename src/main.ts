@@ -61,11 +61,11 @@ function startApp (ev: Event) {
 // add the button dynamically
 new MutationObserver((records) => records.forEach((record) => {
 	record.addedNodes.forEach((elem) => {
-		if (elem instanceof HTMLSpanElement && elem.id === "rating") {
+		if (elem instanceof HTMLSpanElement && elem.classList.contains("rating")) {
 			elem.append(btn);
 		}
 	})
-})).observe(document.getElementById("content")!, {
+})).observe(document.querySelector(".content")!, {
 	childList: true,
 	subtree: true,
 });

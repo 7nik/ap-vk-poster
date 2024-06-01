@@ -320,5 +320,6 @@
         background-image: url(/assets/styles/icons/delete.svg);
         background-size: contain;
         filter: drop-shadow(0 0 1px #0004);
+        vertical-align: text-top;
     }
 </style>

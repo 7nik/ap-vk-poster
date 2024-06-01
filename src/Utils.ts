@@ -190,11 +190,8 @@ async function findTag (tag: string): Promise<{
 }[]> {
     const form = new FormData();
     form.append("tag", tag);
-    const json = await fetch("https://api.anime-pictures.net/pictures/autocomplete_tag", {
-        method: "POST",
-        body: form,
-    }).then((resp) => resp.json());
-    return json.tags_list;
+    const json = await fetch(`https://api.anime-pictures.net/api/v3/tags:autocomplete?tag=${tag}`).then((resp) => resp.json());
+    return json.tags;
 }
 
 export {

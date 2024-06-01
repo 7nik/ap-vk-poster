@@ -133,8 +133,17 @@
         height: 0;
         width: 100%;
     }
+    ul.autocomplite {
+        visibility: hidden;
+    }
     ul.autocomplite.show {
         visibility: visible;
+    }
+    li {
+        background: var(--autocomplite-background);
+    }
+    li:hover, li.autocomplite_active {
+        background: var(--autocomplite-background-active);
     }
     .cat-1 {
         color: #006699;

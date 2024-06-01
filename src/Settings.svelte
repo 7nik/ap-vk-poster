@@ -1,12 +1,9 @@
 <script lang="ts">
-    import { getContext } from "svelte";
     import SETTINGS from "./settings";
     import VkApi from "./vkApi";
     import Button from "./Button.svelte";
     import { getTag } from "./Utils";
     import TagsField from "./TagsField.svelte";
-
-    const light = !getContext("darkTheme");
 
     function save () {
         localStorage.AP_VK_Poster_Settings = JSON.stringify(SETTINGS);
@@ -205,7 +202,7 @@
                 {#each SETTINGS.schedule as time, i}
                     <span class="time">
                         {timeToStr(time)}
-                        <span class="icon_delete" class:light on:click={() => removeTime(i)}></span>
+                        <span class="icon_delete" on:click={() => removeTime(i)}></span>
                     </span>
                 {/each}
             </section>
@@ -260,7 +257,7 @@
                 {#each fTags as tag}
                     <span class="time">
                         {tag.name}
-                        <span class="icon_delete" class:light on:click={() => removeTag(tag.id)}></span>
+                        <span class="icon_delete" on:click={() => removeTag(tag.id)}></span>
                     </span>
                 {/each}
             </section>
@@ -317,8 +314,11 @@
     }
     .icon_delete {
         cursor: pointer;
-    }
-    .icon_delete.light {
-        filter: invert(1);
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        background-image: url(/assets/styles/icons/delete.svg);
+        background-size: contain;
+        filter: drop-shadow(0 0 1px #0004);
     }
 </style>

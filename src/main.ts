@@ -58,25 +58,9 @@ function startApp (ev: Event) {
 	});
 }
 
-// add the button dynamically
-new MutationObserver((records) => records.forEach((record) => {
-	record.addedNodes.forEach((elem) => {
-		if (elem instanceof HTMLSpanElement && elem.classList.contains("rating")) {
-			elem.append(btn);
-		}
-	})
-})).observe(document.querySelector(".content")!, {
-	childList: true,
-	subtree: true,
-});
-// add the button at the page start
-const container = document.querySelector("span.rating");
-if (container) {
-	container.append(btn);
-	// re-add button after it was removed at hydration
-	new MutationObserver((records) => records.forEach(() => {
-		if (!document.body.contains(btn)) {
-			container.append(btn);
-		}
-	})).observe(container, { childList: true });
-}
+// add the button
+setInterval(() => {
+	if (!document.body.contains(btn)) {
+		document.querySelector("span.rating")?.append(btn);
+	}
+}, 300);

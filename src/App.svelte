@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { self, preventDefault } from 'svelte/legacy';
 
+    import { Undo2, Settings as SettingsIcon } from '@lucide/svelte';
 	import { onMount, setContext } from "svelte";
 	import PostMaker from "./PostMaker.svelte";
 	import Settings from "./Settings.svelte";
@@ -17,6 +18,9 @@
 	let showSettings = $state(false);
 	let elem: HTMLElement;
 	let className = $state("");
+
+	let Icon = $derived(showSettings ? Undo2 : SettingsIcon);
+
 	onMount(() => {
 		className = elem.closest("#sidebar")
 			? "sidebar_block"
@@ -32,7 +36,7 @@
 			<span title="Настройки"
 				onclick={preventDefault(() => showSettings = !showSettings)}
 			>
-				{showSettings ? "🔙" : "⚙"}
+				<Icon color={darkTheme ? "white" : "black"} cursor="pointer" />
 			</span>
 		</div>
 		<div class="body">
@@ -59,8 +63,7 @@
 	}
 	span {
 		float: right;
-		margin-right: 5px;
-		font-size: 150%;
+		margin: 4px 5px 0 0;
 		cursor: pointer;
 	}
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import Button from "./Button.svelte";
-	import SETTINGS from "./settings";
+	import SETTINGS from "./settings.svelte";
 	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale } from "./Utils";
 	import VkApi from "./vkApi";
 

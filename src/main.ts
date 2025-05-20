@@ -1,7 +1,5 @@
-import type { SvelteComponent, mount } from 'svelte';
+import { mount, unmount } from 'svelte';
 import App from './App.svelte';
-// import SETTINGS from "./settings";
-
 const style = document.createElement("style");
 style.textContent = `
 	#share-vk {
@@ -28,35 +26,19 @@ btn.innerHTML =
 	</svg>`;
 btn.onclick = startApp;
 
-// @ts-ignore
-// AnimePictures?.hotkeys?.push({
-// 	descr: "make post to vk",
-// 	// @ts-ignore
-// 	hotkey: SETTINGS.hotkey,
-// 	pages: ["/pictures/view_post"],
-// 	selectors: [],
-// 	action: startApp,
-// }, {
-// 	descr: "decline making of VK post",
-// 	hotkey: "Escape",
-// 	pages: ["/"], // all pages
-// 	selectors: [],
-// 	action: () => app.$destroy(),
-// });
-
 function isDarkTheme () {
 	return getComputedStyle(document.documentElement)
     	.getPropertyValue("--messages-users-name") === "#fff";
 }
 
-let app: SvelteComponent;
+let app: App;
 function startApp (ev: Event) {
 	ev.preventDefault();
 	app = mount(App, {
     		target: document.body,
     		props: {
     			darkTheme: isDarkTheme(),
-    			close: () => app.$destroy(),
+    			close: () => unmount(app),
     		},
     	});
 }

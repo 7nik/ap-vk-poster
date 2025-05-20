@@ -1,5 +1,6 @@
 <script lang="ts">
-    import SETTINGS from "./settings";
+    import { Trash2 } from "@lucide/svelte";
+    import SETTINGS from "./settings.svelte";
     import VkApi from "./vkApi";
     import Button from "./Button.svelte";
     import { getTag } from "./Utils";
@@ -202,7 +203,7 @@
                 {#each SETTINGS.schedule as time, i}
                     <span class="time">
                         {timeToStr(time)}
-                        <span class="icon_delete" onclick={() => removeTime(i)}></span>
+                        <Trash2 size={18} cursor="pointer" onclick={() => removeTime(i)} />
                     </span>
                 {/each}
             </section>
@@ -257,7 +258,7 @@
                 {#each fTags as tag}
                     <span class="time">
                         {tag.name}
-                        <span class="icon_delete" onclick={() => removeTag(tag.id)}></span>
+                        <Trash2 size={18} cursor="pointer"  onclick={() => removeTag(tag.id)} />
                     </span>
                 {/each}
             </section>
@@ -311,15 +312,5 @@
     }
     .time:not(:last-child)::after {
         content: ", ";
-    }
-    .icon_delete {
-        cursor: pointer;
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        background-image: url(/assets/styles/icons/delete.svg);
-        background-size: contain;
-        filter: drop-shadow(0 0 1px #0004);
-        vertical-align: text-top;
     }
 </style>

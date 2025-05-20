@@ -49,9 +49,9 @@ anime-pictures.net/android_app - наше приложение, что бы на
     APP_ID: "6733020",
 };
 
-const SETTINGS: typeof DEFAULT_SETTINGS = {
+const SETTINGS: typeof DEFAULT_SETTINGS = $state({
     ...DEFAULT_SETTINGS,
     ...JSON.parse(localStorage.AP_VK_Poster_Settings ?? "{}"),
-}
+});
 
 export default SETTINGS;

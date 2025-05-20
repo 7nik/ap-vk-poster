@@ -2,7 +2,7 @@ import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import sveltePreprocess from 'svelte-preprocess';
+import { sveltePreprocess } from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import styles from "rollup-plugin-styles";
 
@@ -37,7 +37,7 @@ export default {
 
 		resolve({
 			browser: true,
-			dedupe: ['svelte']
+			exportConditions: ['svelte', 'browser']
 		}),
 		commonjs(),
 		typescript(),

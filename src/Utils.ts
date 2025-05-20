@@ -1,4 +1,4 @@
-import SETTINGS from "./settings";
+import SETTINGS from "./settings.svelte";
 
 function plural (n: number, [singular, paucal, plural]: string[]) {
     if ((n % 10) === 1 && (n % 100) !== 11) {

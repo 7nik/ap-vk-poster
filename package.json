@@ -1,6 +1,6 @@
 {
   "name": "ap-vk-poster",
-  "version": "2.6.8",
+  "version": "2.7.0",
   "private": true,
   "scripts": {
     "build": "rollup -c --environment PROD",

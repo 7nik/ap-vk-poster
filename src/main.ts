@@ -1,4 +1,4 @@
-import type { SvelteComponentTyped } from 'svelte';
+import type { SvelteComponent } from 'svelte';
 import App from './App.svelte';
 // import SETTINGS from "./settings";
 
@@ -49,7 +49,7 @@ function isDarkTheme () {
     	.getPropertyValue("--messages-users-name") === "#fff";
 }
 
-let app: SvelteComponentTyped;
+let app: SvelteComponent;
 function startApp (ev: Event) {
 	ev.preventDefault();
 	app = new App({

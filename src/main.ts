@@ -31,7 +31,7 @@ function isDarkTheme () {
     	.getPropertyValue("--messages-users-name") === "#fff";
 }
 
-let app: App;
+let app: any;
 function startApp (ev: Event) {
 	ev.preventDefault();
 	app = mount(App, {

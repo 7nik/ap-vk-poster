@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run, preventDefault } from 'svelte/legacy';
+
     import SETTINGS from "./settings";
     import VkApi from "./vkApi";
     import Button from "./Button.svelte";
@@ -38,15 +40,19 @@
         save();
     }
 
-    let dayStart = timeToStr(SETTINGS.dayStarts);
-    $: saveTime(dayStart, "dayStarts");
-    let dayEnd = timeToStr(SETTINGS.dayEnds);
-    $: saveTime(dayEnd, "dayEnds");
-    let time = new Date().toTimeString().slice(0, 5);
+    let dayStart = $state(timeToStr(SETTINGS.dayStarts));
+    run(() => {
+        saveTime(dayStart, "dayStarts");
+    });
+    let dayEnd = $state(timeToStr(SETTINGS.dayEnds));
+    run(() => {
+        saveTime(dayEnd, "dayEnds");
+    });
+    let time = $state(new Date().toTimeString().slice(0, 5));
 
 	const Vk = new VkApi(SETTINGS.APP_ID, ["photos", "wall"]);
 
-    let groupName = "";
+    let groupName = $state("");
     Vk.groups.getById(SETTINGS.gid, []).then((groups) => {
         const group = groups.find(({ id }) => id === SETTINGS.gid);
         if (group && group.screen_name !== groupName) {
@@ -54,8 +60,8 @@
         }
     });
 
-    let timer: NodeJS.Timeout;
-    $: {
+    let timer: NodeJS.Timeout = $state();
+    run(() => {
         clearTimeout(timer);
         timer = setTimeout(async () => {
             if (!groupName) return;
@@ -73,9 +79,9 @@
                 }
             }
         }, 1000);
-    }
+    });
 
-    let fTags = SETTINGS.forbiddenTags.map((id) => ({ id, name: "..." }));
+    let fTags = $state(SETTINGS.forbiddenTags.map((id) => ({ id, name: "..." })));
     async function loadTags (tags: number[], pos = 0) {
         if (pos >= tags.length) return;
         const tag = await getTag(tags[pos]);
@@ -83,8 +89,8 @@
         loadTags(tags, pos + 1);
     }
     loadTags(SETTINGS.forbiddenTags);
-    let newTagId: number|null;
-    let newTagName = "";
+    let newTagId: number|null = $state();
+    let newTagName = $state("");
     function addTag () {
         if (!newTagId) return;
         SETTINGS.forbiddenTags = [...SETTINGS.forbiddenTags, newTagId];
@@ -98,7 +104,7 @@
         save();
     }
 
-    let section = "message";
+    let section = $state("message");
 </script>
 
 <div>
@@ -126,22 +132,22 @@
     {#if section === "message"}
 
         Шаблон текст к посту:
-        <textarea bind:value={SETTINGS.mainMessage} on:change={save}></textarea>
+        <textarea bind:value={SETTINGS.mainMessage} onchange={save}></textarea>
         <br>
         Бонусные сообщения:
-        <textarea bind:value={SETTINGS.bonusMessages} on:change={save}></textarea>
+        <textarea bind:value={SETTINGS.bonusMessages} onchange={save}></textarea>
         <br>
         Шанс добавления бонусного сообщения:
         {Math.round(SETTINGS.bonusMessageOdds*100)}%
         <input type="range"
             min=0 max=1 step=0.01
             bind:value={SETTINGS.bonusMessageOdds}
-            on:change={save}>
+            onchange={save}>
 
     {:else if section === "posttime"}
 
         <label>
-            <input type="checkbox" bind:checked={SETTINGS.postponed} on:change={save}>
+            <input type="checkbox" bind:checked={SETTINGS.postponed} onchange={save}>
             Делать пост отложенным по-умолчанию
         </label>
         <br>
@@ -150,7 +156,7 @@
             <label>
                 <input type="radio"
                     bind:group={SETTINGS.scheduleMethod}
-                    on:change={save}
+                    onchange={save}
                     name="method"
                     value="step" >
                     шаг
@@ -158,7 +164,7 @@
                 <label>
                 <input type="radio"
                     bind:group={SETTINGS.scheduleMethod}
-                    on:change={save}
+                    onchange={save}
                     name="method"
                     value="scedule" >
                 расписание
@@ -172,7 +178,7 @@
                     min="1"
                     max="684000"
                     bind:value={SETTINGS.stepTime}
-                    on:change={save}
+                    onchange={save}
                 >
             </label>
             <label>
@@ -181,7 +187,7 @@
                     min="0"
                     max={SETTINGS.stepTime}
                     bind:value={SETTINGS.stepTimeDeviation}
-                    on:change={save}
+                    onchange={save}
                 >
             </label>
             <label>
@@ -202,7 +208,7 @@
                 {#each SETTINGS.schedule as time, i}
                     <span class="time">
                         {timeToStr(time)}
-                        <span class="icon_delete" on:click={() => removeTime(i)}></span>
+                        <span class="icon_delete" onclick={() => removeTime(i)}></span>
                     </span>
                 {/each}
             </section>
@@ -215,20 +221,20 @@
             ID: {SETTINGS.gid}
         </label>
         <label>
-            <input type="checkbox" bind:checked={SETTINGS.signPost} on:change={save}>
+            <input type="checkbox" bind:checked={SETTINGS.signPost} onchange={save}>
             Указывать автора поста
         </label>
         <label>
-            <input type="checkbox" bind:checked={SETTINGS.addSource} on:change={save}>
+            <input type="checkbox" bind:checked={SETTINGS.addSource} onchange={save}>
             Добавлять источник поста
         </label>
         <label>
-            <input type="checkbox" bind:checked={SETTINGS.addTopic} on:change={save}>
+            <input type="checkbox" bind:checked={SETTINGS.addTopic} onchange={save}>
             Добавлять категорию "Арт"
         </label>
         <label>
             Размер изображения для загрузки:
-            <select bind:value={SETTINGS.imgSize} on:blur={save}>
+            <select bind:value={SETTINGS.imgSize} onblur={save}>
                 <option value="small">маленький</option>
                 <option value="medium">средний</option>
                 <option value="big">большой</option>
@@ -239,25 +245,25 @@
         {#if SETTINGS.imgSize === "orig"}
             <label>
                 Масштабировать изображение:
-                <input type="number" bind:value={SETTINGS.imgScale} on:change={save}>px
+                <input type="number" bind:value={SETTINGS.imgScale} onchange={save}>px
             </label>
         {/if}
         <label>
             Максимальный уровень эротики для публикации:
-            <select bind:value={SETTINGS.maxErotic} on:blur={save}>
+            <select bind:value={SETTINGS.maxErotic} onblur={save}>
                 <option value={0}>без эротики</option>
                 <option value={1}>лёгкая эротика</option>
                 <option value={2}>средняя эротика</option>
                 <option value={3}>тяжёлая эротика</option>
             </select>
         </label>
-        <form on:submit|preventDefault={addTag}>
+        <form onsubmit={preventDefault(addTag)}>
             Теги запрещающие публикацию:
             <section>
                 {#each fTags as tag}
                     <span class="time">
                         {tag.name}
-                        <span class="icon_delete" on:click={() => removeTag(tag.id)}></span>
+                        <span class="icon_delete" onclick={() => removeTag(tag.id)}></span>
                     </span>
                 {/each}
             </section>

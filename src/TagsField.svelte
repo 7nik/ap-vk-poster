@@ -1,18 +1,27 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { findTag } from "./Utils";
 
-    /**
+
+
+
+    interface Props {
+        /**
      * The placeholder to display in the input field
      */
-    export let placeholder = "";
-    /**
+        placeholder?: string;
+        /**
      * The entered tag id
      */
-    export let tagId: number|null = null;
-    /**
+        tagId?: number|null;
+        /**
      * The field value
      */
-    export let value = "";
+        value?: string;
+    }
+
+    let { placeholder = "", tagId = $bindable(null), value = $bindable("") }: Props = $props();
 
     type AutocompleteTag = {
         c: number, // tag category
@@ -22,12 +31,14 @@
         name: string,
     }
 
-    let inputElem: HTMLInputElement;
-    let tags: AutocompleteTag[] = [];
-    let selTag: AutocompleteTag|null = null;
-    let focused = false;
-    $: show = focused && tags.length > 0;
-    $: tagId = tags.find((t) => t.name === value.trim())?.id ?? null;
+    let inputElem: HTMLInputElement = $state();
+    let tags: AutocompleteTag[] = $state([]);
+    let selTag: AutocompleteTag|null = $state(null);
+    let focused = $state(false);
+    let show = $derived(focused && tags.length > 0);
+    run(() => {
+        tagId = tags.find((t) => t.name === value.trim())?.id ?? null;
+    });
 
     let timer: number;
     function autocomplete () {
@@ -90,26 +101,33 @@
         inputElem.selectionStart = selectionStart;
         inputElem.selectionEnd = selectionEnd;
     }
+
+    export {
+    	placeholder,
+    	tagId,
+    	value,
+    }
 </script>
 
 <svelte:options accessors={true} />
+
 <div>
     <input {placeholder}
         type="search"
         autocomplete="off"
         bind:value
         bind:this={inputElem}
-        on:keydown={selectTag}
-        on:input={autocomplete}
-        on:focus={() => focused = true}
-        on:blur={() => focused = false}
+        onkeydown={selectTag}
+        oninput={autocomplete}
+        onfocus={() => focused = true}
+        onblur={() => focused = false}
     />
     <ul class="autocomplite" class:show>
         {#each tags as tag }
             <li
                 class="cat-{tag.c}"
                 class:autocomplite_active="{tag === selTag}"
-                on:mousedown={selectTag}
+                onmousedown={selectTag}
             >
                 {@html tag.t2 ? `${tag.t} → ${tag.t2}` : tag.t}
             </li>

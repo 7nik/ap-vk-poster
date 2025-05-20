@@ -1,4 +1,4 @@
-import type { SvelteComponent } from 'svelte';
+import type { SvelteComponent, mount } from 'svelte';
 import App from './App.svelte';
 // import SETTINGS from "./settings";
 
@@ -52,13 +52,13 @@ function isDarkTheme () {
 let app: SvelteComponent;
 function startApp (ev: Event) {
 	ev.preventDefault();
-	app = new App({
-		target: document.body,
-		props: {
-			darkTheme: isDarkTheme(),
-			close: () => app.$destroy(),
-		},
-	});
+	app = mount(App, {
+    		target: document.body,
+    		props: {
+    			darkTheme: isDarkTheme(),
+    			close: () => app.$destroy(),
+    		},
+    	});
 }
 
 // add the button

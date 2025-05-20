@@ -1,10 +1,18 @@
 <script lang="ts">
-    export let disabled = false;
-    export let error = false;
+	import { createBubbler } from 'svelte/legacy';
+
+	const bubble = createBubbler();
+	interface Props {
+		disabled?: boolean;
+		error?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { disabled = false, error = false, children }: Props = $props();
 </script>
 
-<button class:error disabled={disabled} on:click>
-    <slot/>
+<button class:error disabled={disabled} onclick={bubble('click')}>
+    {@render children?.()}
 </button>
 
 <style>

@@ -1,16 +1,22 @@
 <script lang="ts">
+	import { self, preventDefault } from 'svelte/legacy';
+
 	import { onMount, setContext } from "svelte";
 	import PostMaker from "./PostMaker.svelte";
 	import Settings from "./Settings.svelte";
 
-	export let darkTheme = false;
-	export let close = () => {};
+	interface Props {
+		darkTheme?: boolean;
+		close?: any;
+	}
+
+	let { darkTheme = false, close = () => {} }: Props = $props();
 
 	setContext("darkTheme", darkTheme);
 
-	let showSettings = false;
-	let elem: HTMLElement;
-	let className = "";
+	let showSettings = $state(false);
+	let elem: HTMLElement = $state();
+	let className = $state("");
 	onMount(() => {
 		className = elem.closest("#sidebar")
 			? "sidebar_block"
@@ -18,12 +24,12 @@
 	});
 </script>
 
-<div class="post_maker" on:click|self={close}>
+<div class="post_maker" onclick={self(close)}>
 	<div bind:this={elem} class={className}>
 		<div class="title">
 			Создание поста для Вконтакте
 			<span title="Настройки" 
-				on:click|preventDefault={() => showSettings = !showSettings} 
+				onclick={preventDefault(() => showSettings = !showSettings)} 
 			>
 				{showSettings ? "🔙" : "⚙"}
 			</span>

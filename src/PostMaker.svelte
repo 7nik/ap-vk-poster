@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
     import Button from "./Button.svelte";
 	import SETTINGS from "./settings";
 	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale } from "./Utils";
 	import VkApi from "./vkApi";
 
-	export let close = () => {};
+	let { close = () => {} } = $props();
 
 	type PostPreview = {
 		preview: string,
@@ -13,26 +15,26 @@
 	};
 
 	const timezone = new Date().getTimezoneOffset();
-	let ready = false;
-	let postponed: boolean | null = true; // null - cannot postpone
-	let previews: PostPreview[] = [];
-	let pubtimeStr: string;
-	$: pubtimeDate = pubtimeStr ? new Date(pubtimeStr+"Z") : null;
-	let offset = "";
-	$: {
+	let ready = $state(false);
+	let postponed: boolean | null = $state(true); // null - cannot postpone
+	let previews: PostPreview[] = $state([]);
+	let pubtimeStr: string = $state();
+	let pubtimeDate = $derived(pubtimeStr ? new Date(pubtimeStr+"Z") : null);
+	let offset = $state("");
+	run(() => {
 		const lastPostDate = previews[0]?.link
 			? previews[0]?.date
 			: previews[1]?.date;
 		if (!postponed || !lastPostDate || !pubtimeDate) {
 			offset = "";
-			break $;
+			return;
 		}
 		let diff = pubtimeDate.getTime() - lastPostDate;
 		let str: (string|number)[] = [" после последнего поста"];
 		let n;
 		if (diff < 60000) { // less than 1 minute
 			offset = "раньше последнего  поста";
-			break $;
+			return;
 		}
 		diff = Math.round(diff/60000); // to minutes
 		n = diff%60;
@@ -50,13 +52,13 @@
 		}
 		str = ["через ", ...str];
 		offset = str.join("");
-	}
+	});
 
 	// get post info
-	let message = "";
+	let message = $state("");
 	let previewUrl = "";
 	let source = "";
-	let error = "";
+	let error = $state("");
 
 	let picture: Promise<File> = getPostInfo().then(async (post) => {
 		({ message, previewUrl, source, error } = post);
@@ -167,7 +169,7 @@
 
 <div class="container">
     <textarea bind:value={message}></textarea>
-    <!-- svelte-ignore a11y-img-redundant-alt -->
+    <!-- svelte-ignore a11y_img_redundant_alt -->
     <!-- <img src="{previewUrl}" alt="Picture to post"/> -->
     <div class="publish_date">
         <label>

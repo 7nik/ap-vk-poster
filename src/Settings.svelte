@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { run, preventDefault } from 'svelte/legacy';
-
     import SETTINGS from "./settings";
     import VkApi from "./vkApi";
     import Button from "./Button.svelte";
@@ -41,13 +39,7 @@
     }
 
     let dayStart = $state(timeToStr(SETTINGS.dayStarts));
-    run(() => {
-        saveTime(dayStart, "dayStarts");
-    });
     let dayEnd = $state(timeToStr(SETTINGS.dayEnds));
-    run(() => {
-        saveTime(dayEnd, "dayEnds");
-    });
     let time = $state(new Date().toTimeString().slice(0, 5));
 
 	const Vk = new VkApi(SETTINGS.APP_ID, ["photos", "wall"]);
@@ -60,8 +52,9 @@
         }
     });
 
-    let timer: NodeJS.Timeout = $state();
-    run(() => {
+    let timer: NodeJS.Timeout;
+    $effect(() => {
+        groupName;
         clearTimeout(timer);
         timer = setTimeout(async () => {
             if (!groupName) return;
@@ -89,7 +82,8 @@
         loadTags(tags, pos + 1);
     }
     loadTags(SETTINGS.forbiddenTags);
-    let newTagId: number|null = $state();
+
+    let newTagId: number|null = $state(null);
     let newTagName = $state("");
     function addTag () {
         if (!newTagId) return;
@@ -115,15 +109,15 @@
                 Шаблон текст поста
             </label>
         </li>
-        <li class:sel={section === "posttime"}>
+        <li class:sel={section === "postTime"}>
             <label>
-                <input type="radio" name="section" bind:group={section} value="posttime">
+                <input type="radio" name="section" bind:group={section} value="postTime">
                 Время отложенного поста
             </label>
         </li>
-        <li class:sel={section === "postoptions"}>
+        <li class:sel={section === "postOptions"}>
             <label>
-                <input type="radio" name="section" bind:group={section} value="postoptions">
+                <input type="radio" name="section" bind:group={section} value="postOptions">
                 Общие настройки поста
             </label>
         </li>
@@ -144,7 +138,7 @@
             bind:value={SETTINGS.bonusMessageOdds}
             onchange={save}>
 
-    {:else if section === "posttime"}
+    {:else if section === "postTime"}
 
         <label>
             <input type="checkbox" bind:checked={SETTINGS.postponed} onchange={save}>
@@ -166,7 +160,7 @@
                     bind:group={SETTINGS.scheduleMethod}
                     onchange={save}
                     name="method"
-                    value="scedule" >
+                    value="schedule" >
                 расписание
             </label>
         </section>
@@ -192,16 +186,16 @@
             </label>
             <label>
                 Начало дня:
-                <input type="time" bind:value={dayStart}>
+                <input type="time" bind:value={dayStart} onchange={() => saveTime(dayStart, "dayStarts")}>
             </label>
             <label>
                 Конец дня:
-                <input type="time" bind:value={dayEnd}>
+                <input type="time" bind:value={dayEnd} onchange={() => saveTime(dayEnd, "dayEnd")}>
             </label>
         {:else}
             <label>
                 <input type="time" bind:value={time}>
-                <Button on:click={addTime}>Добавить время</Button>
+                <Button onclick={addTime}>Добавить время</Button>
             </label>
             Список времён для публикации:
             <section>
@@ -214,9 +208,9 @@
             </section>
         {/if}
 
-    {:else if section === "postoptions"}
+    {:else if section === "postOptions"}
         <label>
-            Адресс группы для публикации:
+            Адрес группы для публикации:
             <input bind:value={groupName}>
             ID: {SETTINGS.gid}
         </label>
@@ -257,7 +251,7 @@
                 <option value={3}>тяжёлая эротика</option>
             </select>
         </label>
-        <form onsubmit={preventDefault(addTag)}>
+        <form onsubmit={(ev) => { ev.preventDefault(); addTag(); }}>
             Теги запрещающие публикацию:
             <section>
                 {#each fTags as tag}

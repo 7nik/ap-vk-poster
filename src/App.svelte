@@ -15,7 +15,7 @@
 	setContext("darkTheme", darkTheme);
 
 	let showSettings = $state(false);
-	let elem: HTMLElement = $state();
+	let elem: HTMLElement;
 	let className = $state("");
 	onMount(() => {
 		className = elem.closest("#sidebar")
@@ -24,12 +24,13 @@
 	});
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div class="post_maker" onclick={self(close)}>
 	<div bind:this={elem} class={className}>
 		<div class="title">
 			Создание поста для Вконтакте
-			<span title="Настройки" 
-				onclick={preventDefault(() => showSettings = !showSettings)} 
+			<span title="Настройки"
+				onclick={preventDefault(() => showSettings = !showSettings)}
 			>
 				{showSettings ? "🔙" : "⚙"}
 			</span>

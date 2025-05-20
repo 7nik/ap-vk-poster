@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
     import Button from "./Button.svelte";
 	import SETTINGS from "./settings";
 	import { plural, getPostInfo, proposeDateByStep, proposeDateBySchedule, downscale } from "./Utils";
@@ -18,23 +16,20 @@
 	let ready = $state(false);
 	let postponed: boolean | null = $state(true); // null - cannot postpone
 	let previews: PostPreview[] = $state([]);
-	let pubtimeStr: string = $state();
-	let pubtimeDate = $derived(pubtimeStr ? new Date(pubtimeStr+"Z") : null);
-	let offset = $state("");
-	run(() => {
+	let pubTimeStr: string = $state("");
+	let pubTimeDate = $derived(pubTimeStr ? new Date(pubTimeStr+"Z") : null);
+	let offset = $derived.by(() => {
 		const lastPostDate = previews[0]?.link
 			? previews[0]?.date
 			: previews[1]?.date;
-		if (!postponed || !lastPostDate || !pubtimeDate) {
-			offset = "";
-			return;
+		if (!postponed || !lastPostDate || !pubTimeDate) {
+			return "";
 		}
-		let diff = pubtimeDate.getTime() - lastPostDate;
+		let diff = pubTimeDate.getTime() - lastPostDate;
 		let str: (string|number)[] = [" после последнего поста"];
 		let n;
 		if (diff < 60000) { // less than 1 minute
-			offset = "раньше последнего  поста";
-			return;
+			return "раньше последнего поста";
 		}
 		diff = Math.round(diff/60000); // to minutes
 		n = diff%60;
@@ -50,8 +45,7 @@
 		if (diff) {
 			str = [diff, " ", plural(diff, ["день", "дня", "дней"]), ...str];
 		}
-		str = ["через ", ...str];
-		offset = str.join("");
+		return ["через ", ...str].join("");
 	});
 
 	// get post info
@@ -113,7 +107,7 @@
 		const scheduler = SETTINGS.scheduleMethod === "step"
 			? proposeDateByStep
 			: proposeDateBySchedule;
-		pubtimeStr = scheduler(posts[0]?.date*1000).toISOString().slice(0, -1);
+		pubTimeStr = scheduler(posts[0]?.date*1000).toISOString().slice(0, -1);
 
 		await picture;
 		// generate previews of scheduled posts including the current one
@@ -135,9 +129,9 @@
 		previews.unshift({
 			preview: previewUrl,
 			link: "",
-			date: pubtimeDate?.getTime() ?? 0,
+			date: pubTimeDate?.getTime() ?? 0,
 		});
-		if (pubtimeDate) {
+		if (pubTimeDate) {
 			previews = previews.sort((a, b) => b.date - a.date);
 		}
 	})();
@@ -146,8 +140,8 @@
 		// post the message and the picture to vk
 		try {
 			const { id, owner_id} = await wallPhoto;
-			const publish_date = postponed && pubtimeDate
-				? pubtimeDate.getTime()/1000 + timezone*60
+			const publish_date = postponed && pubTimeDate
+				? pubTimeDate.getTime()/1000 + timezone*60
 				: 0;
 			await Vk.wall.post({
 				owner_id: -SETTINGS.gid,
@@ -177,14 +171,14 @@
             отложенная запись
         </label>
 		<Button
-			on:click={makePost}
+			onclick={makePost}
 			disabled={!ready}
 			error={error !== ""}
 		>
 			{error || (ready ? "Опубликовать пост" : "Подготовка")}
 		</Button>
         <br>
-        <input type="datetime-local" bind:value={pubtimeStr} disabled={!postponed} />
+        <input type="datetime-local" bind:value={pubTimeStr} disabled={!postponed} />
         <br>
         <span>{offset}</span>
     </div>

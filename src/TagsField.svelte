@@ -1,10 +1,5 @@
 <script lang="ts">
-    import { run } from 'svelte/legacy';
-
     import { findTag } from "./Utils";
-
-
-
 
     interface Props {
         /**
@@ -31,12 +26,12 @@
         name: string,
     }
 
-    let inputElem: HTMLInputElement = $state();
+    let inputElem: HTMLInputElement;
     let tags: AutocompleteTag[] = $state([]);
     let selTag: AutocompleteTag|null = $state(null);
     let focused = $state(false);
     let show = $derived(focused && tags.length > 0);
-    run(() => {
+    $effect(() => {
         tagId = tags.find((t) => t.name === value.trim())?.id ?? null;
     });
 
@@ -101,15 +96,7 @@
         inputElem.selectionStart = selectionStart;
         inputElem.selectionEnd = selectionEnd;
     }
-
-    export {
-    	placeholder,
-    	tagId,
-    	value,
-    }
 </script>
-
-<svelte:options accessors={true} />
 
 <div>
     <input {placeholder}
@@ -122,11 +109,12 @@
         onfocus={() => focused = true}
         onblur={() => focused = false}
     />
-    <ul class="autocomplite" class:show>
+    <ul class="autocomplete" class:show>
         {#each tags as tag }
+            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
             <li
                 class="cat-{tag.c}"
-                class:autocomplite_active="{tag === selTag}"
+                class:autocomplete_active="{tag === selTag}"
                 onmousedown={selectTag}
             >
                 {@html tag.t2 ? `${tag.t} → ${tag.t2}` : tag.t}
@@ -151,16 +139,16 @@
         height: 0;
         width: 100%;
     }
-    ul.autocomplite {
+    ul.autocomplete {
         visibility: hidden;
     }
-    ul.autocomplite.show {
+    ul.autocomplete.show {
         visibility: visible;
     }
     li {
         background: var(--autocomplite-background);
     }
-    li:hover, li.autocomplite_active {
+    li:hover, li.autocomplete_active {
         background: var(--autocomplite-background-active);
     }
     .cat-1 {

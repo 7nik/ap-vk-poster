@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { createBubbler } from 'svelte/legacy';
+	import type { Snippet } from 'svelte';
+    import type { HTMLButtonAttributes } from 'svelte/elements';
 
-	const bubble = createBubbler();
-	interface Props {
-		disabled?: boolean;
+	interface Props extends HTMLButtonAttributes {
 		error?: boolean;
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
-	let { disabled = false, error = false, children }: Props = $props();
+	let { error = false, children, ...rest }: Props = $props();
 </script>
 
-<button class:error disabled={disabled} onclick={bubble('click')}>
+<button class:error {...rest}>
     {@render children?.()}
 </button>
 

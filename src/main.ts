@@ -8,6 +8,9 @@ style.textContent = `
 		margin: 0px 10px;
 		/* turn grey filling into black */
 		filter: contrast(2);
+		vertical-align: middle;
+		display: inline-block;
+		height: 32px;
 	}
 	#share-vk svg {
 		fill: var(--messages-users-name, #808080);

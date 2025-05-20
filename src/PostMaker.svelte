@@ -67,27 +67,15 @@
 			responseType: "arraybuffer",
 		}) as any;
 		if (resp.status < 400) {
-			const file = new File([resp.response], "photo.jpg", { type: "image/jpeg" });
+			const file = new File([resp.response], "photo.avif", { type: "image/avif" });
 			if (SETTINGS.imgSize === "orig" && SETTINGS.imgScale) {
 				return downscale(file, SETTINGS.imgScale);
 			}
-			return file;
+			// VK doesn't understands avif so convert it
+			return downscale(file);
 		}
-		resp = await GM.xmlHttpRequest({
-			method: "GET",
-			url: `${previewUrl}.avif`,
-			// @ts-ignore - it's supported in TM
-			responseType: "arraybuffer",
-		}) as any;
-		if (resp.status < 400) {
-			error = "Ошибка скачивания картинки";
-		}
-		const file = new File([resp.response], "photo.avif", { type: "image/jpeg" });
-		if (SETTINGS.imgSize === "orig" && SETTINGS.imgScale) {
-			return downscale(file, SETTINGS.imgScale);
-		}
-		// VK doesn't understands avif so convert it
-		return downscale(file);
+		error = "Ошибка скачивания картинки";
+		throw new Error(error);
 	});
 
 	const Vk = new VkApi(SETTINGS.APP_ID, ["photos", "wall"]);
